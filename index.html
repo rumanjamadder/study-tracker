@@ -92,7 +92,7 @@ input{ font-family: inherit; }
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border);
 }
-.topbar-left{ justify-self:start; display:flex; align-items:center; gap:.7rem; min-width:0; }
+.topbar-left{ justify-self:start; display:flex; align-items:center; gap:.6rem; min-width:0; }
 .topbar-right{ justify-self:end; display:flex; align-items:center; gap:.7rem; min-width:0; }
 .topbar-center{ justify-self:center; min-width:0; }
 .icon-btn{
@@ -104,46 +104,49 @@ input{ font-family: inherit; }
 .icon-btn:hover{ color: var(--accent); border-color: var(--accent); }
 .hamburger-btn{ display:flex !important; flex-direction:column; align-items:center; justify-content:center; gap:4px; }
 
-.navbar-countdown{
-  display:flex; align-items:center; gap:.5rem; padding:.35rem .8rem; border-radius:999px;
-  background: var(--accent-soft); border:1px solid var(--border); white-space:nowrap;
+.topbar-brand{
+  display:flex; align-items:center; gap:.55rem; border:none; background:transparent;
+  padding:.2rem .3rem; border-radius: var(--radius-sm); flex-shrink:0; transition: var(--transition);
 }
-.navbar-countdown .nc-num{ font-family: var(--font-mono); font-weight:700; font-size:.9rem; color: var(--accent); }
-.navbar-countdown .nc-label{ font-size:.68rem; color: var(--text-soft); }
-.navbar-countdown.nc-empty{ opacity:.6; cursor:pointer; }
+.topbar-brand:hover{ background: var(--surface-2); }
+.topbar-brand .brand-mark{
+  width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center;
+  background: linear-gradient(135deg, var(--emerald), var(--emerald-deep)); color:#fff;
+  font-family: var(--font-display); font-weight:700; font-size:.95rem; flex-shrink:0;
+}
+.topbar-brand-text{ font-family: var(--font-display); font-weight:700; font-size:.9rem; color: var(--text); white-space:nowrap; }
 
-.prayer-widget{
-  display:flex; flex-direction:column; gap:.3rem;
-  padding: .4rem .7rem; border-radius: var(--radius-sm);
-  background: var(--surface); border:1px solid var(--border);
-  min-width: 0;
+.navbar-countdown{
+  display:flex; align-items:baseline; gap:.5rem; padding:.5rem 1.1rem; border-radius:999px;
+  border:none; white-space:nowrap; cursor:pointer;
+  background: linear-gradient(135deg, var(--accent), var(--clay));
+  box-shadow: 0 6px 18px -8px rgba(232,163,61,.6);
+  animation: navCountdownGlow 3s ease-in-out infinite;
+  transition: var(--transition);
 }
-.prayer-widget-head{
-  display:flex; align-items:center; gap:.4rem;
-  font-size:.72rem; font-weight:600; color: var(--accent);
-  white-space: nowrap; overflow:hidden; text-overflow: ellipsis;
+.navbar-countdown:hover{ transform: translateY(-1px); }
+.navbar-countdown .nc-num{ font-family: var(--font-mono); font-weight:800; font-size:1.5rem; color:#fff; letter-spacing:.01em; }
+.navbar-countdown .nc-unit{ font-size:.74rem; font-weight:600; color: rgba(255,255,255,.9); }
+.navbar-countdown.nc-empty{ opacity:.55; background: var(--surface-2); box-shadow:none; animation:none; }
+.navbar-countdown.nc-empty .nc-num, .navbar-countdown.nc-empty .nc-unit{ color: var(--text-faint); }
+@keyframes navCountdownGlow{
+  0%,100%{ box-shadow: 0 6px 18px -8px rgba(232,163,61,.6); }
+  50%{ box-shadow: 0 6px 26px -6px rgba(232,163,61,.9); }
 }
-.prayer-widget-body{ display:flex; gap:.35rem; flex-wrap: wrap; }
-.prayer-chip{
-  font-family: var(--font-mono); font-size: .68rem;
-  padding: .12rem .4rem; border-radius: 5px;
-  background: var(--surface-2); color: var(--text-soft);
-  border:1px solid transparent;
-}
-.prayer-chip.active{ border-color: var(--accent); color: var(--accent); }
-.prayer-chip.skeleton{ opacity:.5; }
+@media (prefers-reduced-motion: reduce){ .navbar-countdown{ animation:none; } }
 
 .water-mini{
-  display:flex; align-items:center; gap:.45rem;
+  display:flex; align-items:center; gap:.45rem; border:1px solid var(--border); cursor:pointer;
   padding: .35rem .6rem; border-radius: var(--radius-sm);
-  background: var(--surface); border:1px solid var(--border);
-  color: var(--primary); font-size:.75rem;
+  background: var(--surface);
+  color: var(--primary); font-size:.75rem; transition: var(--transition);
 }
+.water-mini:hover{ border-color: var(--accent); }
 .water-mini-track{ width:56px; height:6px; border-radius:4px; background: var(--track); overflow:hidden; }
 .water-mini-fill{ height:100%; width:0%; background: linear-gradient(90deg, var(--primary), var(--accent)); transition: width .4s ease; }
 #waterMiniText{ color: var(--text-soft); white-space:nowrap; }
 .water-mini-add{
-  border:none; background: var(--primary); color:#fff; font-weight:600;
+  display:inline-block; border:none; background: var(--primary); color:#fff; font-weight:600;
   font-size:.68rem; padding:.2rem .45rem; border-radius:6px; transition: var(--transition);
 }
 .water-mini-add:hover{ background: var(--primary-strong); }
@@ -479,21 +482,40 @@ body[data-theme="light"] .field input{ color-scheme: light; }
 @keyframes toastIn{ from{ opacity:0; transform: translateX(20px);} to{ opacity:1; transform:none; } }
 
 /* ===================== RESPONSIVE ===================== */
+html, body{ overflow-x: hidden; max-width: 100%; }
+img, svg, canvas{ max-width: 100%; }
+
 @media (max-width: 980px){
   .stat-grid{ grid-template-columns: repeat(2,1fr); }
   .panel-grid{ grid-template-columns: 1fr; }
 }
 @media (max-width: 800px){
-  .prayer-widget{ max-width: 46vw; }
   .water-mini span#waterMiniText{ display:none; }
 }
-@media (max-width: 600px){
-  .main{ padding: 1.1rem 1rem 2.4rem; }
-  .stat-grid{ grid-template-columns: 1fr 1fr; }
-  .view-head{ flex-direction:column; align-items:flex-start; }
-  .topbar{ padding:.6rem .7rem; }
+@media (max-width: 640px){
+  .main{ padding: 1.1rem .9rem 2.4rem; }
+  .stat-grid{ grid-template-columns: 1fr 1fr; gap:.6rem; }
+  .stat-value{ font-size:1.3rem; }
+  .view-head{ flex-direction:column; align-items:flex-start; gap:.6rem; }
+  .view-head h1{ font-size:1.3rem; }
+  .topbar{ padding:.55rem .6rem; gap:.5rem; }
   .field-row{ flex-direction:column; }
-  .modal-card{ padding: 1.4rem 1.2rem 1.6rem; }
+  .modal-card{ padding: 1.4rem 1.2rem 1.6rem; max-width: calc(100vw - 2rem); }
+  .range-switch{ flex-wrap: wrap; justify-content:center; }
+  .range-btn{ padding:.3rem .65rem; font-size:.72rem; }
+  .panel{ padding: 1rem 1.05rem; }
+  .duration-presets{ flex-wrap:wrap; }
+  .settings-btn-row{ flex-direction:column; align-items:stretch; }
+  .settings-btn-row button{ width:100%; }
+  .water-actions{ flex-direction:column; width:100%; }
+  .water-actions button{ width:100%; }
+}
+@media (max-width: 420px){
+  .water-mini-track{ display:none; }
+  .stat-grid{ grid-template-columns: 1fr; }
+  .brand-text small{ display:none; }
+  .sidebar{ width: min(232px, 82vw); }
+  .home-clock-time{ font-size:1.05rem; }
 }
 
 /* ============================================================
@@ -503,7 +525,7 @@ body[data-theme="light"] .field input{ color-scheme: light; }
    ============================================================ */
 
 /* ---- Dashboard quick widgets ---- */
-.quick-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:.9rem; margin-bottom:1rem; }
+.quick-grid{ display:grid; grid-template-columns: 1.5fr 1fr 1fr; gap:.9rem; margin-bottom:1rem; }
 .quick-card{ display:flex; flex-direction:column; gap:.6rem; }
 .quick-card-head{ display:flex; align-items:center; gap:.5rem; color: var(--accent); }
 .quick-card-head h3{ font-size:.92rem; font-weight:600; color: var(--text); }
@@ -515,6 +537,32 @@ body[data-theme="light"] .field input{ color-scheme: light; }
 .pace-ahead{ background: rgba(46,139,116,.15); color: var(--emerald-soft); }
 .pace-ontrack{ background: rgba(232,163,61,.15); color: var(--marigold); }
 .pace-behind{ background: rgba(196,86,46,.15); color: var(--clay); }
+
+/* Hero treatment: the countdown is the most important number on the
+   dashboard, so it gets a wider card, a much bigger animated digit,
+   and a soft glowing pulse behind it. */
+.countdown-hero{ position:relative; overflow:hidden; justify-content:center; }
+.countdown-hero::before{
+  content:''; position:absolute; top:-45%; right:-15%; width:260px; height:260px; border-radius:50%;
+  background: radial-gradient(circle, var(--accent-soft) 0%, transparent 72%);
+  animation: countdownGlow 4.5s ease-in-out infinite; pointer-events:none;
+}
+@keyframes countdownGlow{ 0%,100%{ opacity:.5; transform:scale(1); } 50%{ opacity:1; transform:scale(1.18); } }
+.countdown-hero .countdown-num{
+  position:relative; font-size: clamp(3rem, 6vw, 4.4rem); font-weight:700; line-height:1; letter-spacing:-.01em;
+  background: linear-gradient(135deg, var(--accent), var(--emerald-soft));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  animation: countdownPulse 2.6s ease-in-out infinite; width:fit-content;
+}
+@keyframes countdownPulse{
+  0%,100%{ filter: drop-shadow(0 0 0 rgba(232,163,61,0)); transform:scale(1); }
+  50%{ filter: drop-shadow(0 0 18px rgba(232,163,61,.5)); transform:scale(1.015); }
+}
+.countdown-hero .countdown-sub{ position:relative; font-size:.82rem; }
+.countdown-hero .countdown-pace{ position:relative; font-size:.8rem; padding:.35rem .7rem; }
+@media (prefers-reduced-motion: reduce){
+  .countdown-hero::before, .countdown-hero .countdown-num{ animation: none; }
+}
 
 .goal-mini-row{ display:flex; flex-direction:column; gap:.5rem; }
 .goal-mini{ display:flex; flex-direction:column; gap:.25rem; }
@@ -623,28 +671,6 @@ body[data-theme="light"] .field input{ color-scheme: light; }
 .book-update-row{ display:flex; gap:.5rem; margin-top:.2rem; }
 .book-update-row input{ flex:1; padding:.4rem .55rem; border-radius: var(--radius-sm); border:1px solid var(--border); background: var(--bg-elevated); color: var(--text); font-size:.78rem; }
 .book-update-row button{ border:none; background: var(--primary); color:#fff; font-weight:600; font-size:.75rem; padding:.4rem .7rem; border-radius: var(--radius-sm); }
-
-/* ---- Kanban ---- */
-.kanban-board{ display:grid; grid-template-columns: repeat(3, 1fr); gap: .9rem; align-items:start; }
-.kanban-col{ background: var(--surface); border:1px solid var(--border); border-radius: var(--radius-md); padding:.9rem; min-height: 160px; }
-.kanban-col h3{ font-size:.85rem; margin-bottom:.7rem; display:flex; align-items:center; gap:.4rem; }
-.kanban-count{ font-family: var(--font-mono); font-size:.68rem; color: var(--text-faint); background: var(--surface-2); padding:.05rem .4rem; border-radius:999px; }
-.kanban-list{ display:flex; flex-direction:column; gap:.55rem; min-height: 50px; }
-.kanban-list.drag-over{ background: var(--accent-soft); border-radius: var(--radius-sm); }
-.task-card{
-  background: var(--surface-2); border:1px solid var(--border); border-radius: var(--radius-sm);
-  padding:.6rem .7rem; cursor:grab; display:flex; flex-direction:column; gap:.35rem; transition: var(--transition);
-}
-.task-card:active{ cursor:grabbing; }
-.task-card.dragging{ opacity:.4; }
-.task-card-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:.4rem; }
-.task-card-top strong{ font-size:.8rem; line-height:1.3; }
-.task-meta-row{ display:flex; justify-content:space-between; align-items:center; font-size:.68rem; color: var(--text-faint); }
-.priority-badge{ font-size:.62rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em; padding:.15rem .4rem; border-radius:5px; }
-.priority-low{ background: rgba(46,139,116,.18); color: var(--emerald-soft); }
-.priority-medium{ background: rgba(232,163,61,.18); color: var(--marigold); }
-.priority-high{ background: rgba(196,86,46,.2); color: var(--clay); }
-.task-deadline.overdue{ color: var(--clay); font-weight:600; }
 .task-del-btn{ border:none; background:transparent; color: var(--text-faint); font-size:.8rem; line-height:1; padding:0; }
 .task-del-btn:hover{ color: var(--clay); }
 
@@ -666,7 +692,6 @@ body[data-theme="light"] .field input{ color-scheme: light; }
 /* ---- Responsive ---- */
 @media (max-width: 980px){
   .quick-grid{ grid-template-columns: 1fr; }
-  .kanban-board{ grid-template-columns: 1fr; }
   .achv-grid{ grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
 }
 @media (max-width: 600px){
@@ -752,13 +777,17 @@ body[data-theme="light"] .field input{ color-scheme: light; }
 #achvPopupTitle{ font-size:1.5rem; }
 
 /* ============================================================
-   MISC — navbar countdown responsive
+   MISC — navbar countdown & brand responsive
    ============================================================ */
 @media (max-width: 720px){
-  .navbar-countdown .nc-label{ display:none; }
+  .navbar-countdown{ padding:.4rem .8rem; }
+  .navbar-countdown .nc-num{ font-size:1.15rem; }
+  .navbar-countdown .nc-unit{ font-size:.66rem; }
 }
-@media (max-width: 520px){
-  .topbar-center{ display:none; }
+@media (max-width: 480px){
+  .topbar-brand-text{ display:none; }
+  .navbar-countdown{ padding:.35rem .6rem; gap:.35rem; }
+  .navbar-countdown .nc-num{ font-size:1rem; }
 }
 
 /* ============================================================
@@ -780,6 +809,7 @@ body[data-theme="light"] .field input{ color-scheme: light; }
 }
 .reminder-overlay.active{ display:flex; animation: reminderFadeIn .35s ease; }
 .reminder-overlay.theme-water{ background: radial-gradient(circle at 50% 35%, #0E5C7A 0%, #06171f 75%); }
+.reminder-overlay.theme-countdown{ background: radial-gradient(circle at 50% 35%, #7A4A12 0%, #1a0f05 75%); }
 @keyframes reminderFadeIn{ from{ opacity:0; } to{ opacity:1; } }
 
 .reminder-card{ max-width: 420px; display:flex; flex-direction:column; align-items:center; gap:.5rem; }
@@ -789,6 +819,7 @@ body[data-theme="light"] .field input{ color-scheme: light; }
   border:2px solid var(--marigold); opacity:.6; animation: reminderRipple 2.6s ease-out infinite;
 }
 .reminder-overlay.theme-water .reminder-ripple{ border-color:#7FD4F0; }
+.reminder-overlay.theme-countdown .reminder-ripple{ border-color:#FFB74D; }
 .reminder-ripple:nth-child(2){ animation-delay:.7s; }
 .reminder-ripple:nth-child(3){ animation-delay:1.4s; }
 @keyframes reminderRipple{
@@ -820,6 +851,7 @@ body[data-theme="light"] .field input{ color-scheme: light; }
 
 /* ============================================================
    HOME CLOCK — live clock, top-right of the homepage
+   HOME NEW SESSION BUTTON — quick action, top-left of the homepage
    ============================================================ */
 #view-home{ position:relative; }
 .home-clock{
@@ -829,8 +861,28 @@ body[data-theme="light"] .field input{ color-scheme: light; }
 }
 .home-clock-time{ font-family: var(--font-mono); font-size:1.3rem; font-weight:600; color: var(--primary); letter-spacing:.02em; }
 .home-clock-date{ font-size:.7rem; color: var(--text-faint); margin-top:.1rem; }
+
+.home-new-session-btn{
+  position:absolute; top:.5rem; left:.5rem; z-index:2; display:inline-flex; align-items:center; gap:.45rem;
+  background: linear-gradient(135deg, var(--emerald-soft), var(--emerald-deep)); color:#fff; border:none;
+  padding:.65rem 1.1rem; border-radius: var(--radius-md); font-weight:600; font-size:.85rem;
+  box-shadow: var(--shadow-soft); transition: var(--transition);
+}
+.home-new-session-btn:hover{ transform: translateY(-1px); filter: brightness(1.06); }
+
+.home-daily-total{
+  position:absolute; bottom:.5rem; left:.5rem; display:flex; flex-direction:column; align-items:flex-start;
+  padding:.7rem 1rem; border-radius: var(--radius-md); background: var(--surface); border:1px solid var(--border);
+  box-shadow: var(--shadow-soft);
+}
+.hdt-label{ font-size:.68rem; color: var(--text-faint); font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
+.hdt-time{ font-family: var(--font-mono); font-size:1.5rem; font-weight:700; color: var(--primary); letter-spacing:.02em; margin-top:.15rem; }
+.hdt-sub{ font-size:.64rem; color: var(--text-faint); margin-top:.1rem; }
+
 @media (max-width: 600px){
-  .home-clock{ position:static; align-items:center; margin-bottom:1rem; }
+  .home-clock{ position:static; align-items:center; margin-bottom:.7rem; }
+  .home-new-session-btn{ position:static; margin-bottom:.7rem; }
+  .home-daily-total{ position:static; align-items:center; margin-top:1rem; }
 }
 
 /* ============================================================
@@ -843,7 +895,7 @@ body[data-theme="light"] .field input{ color-scheme: light; }
 }
 
 /* ============================================================
-   CLOUD SYNC & LOGIN panel
+   ACCOUNT & SYNC panel
    ============================================================ */
 .cloud-panel{ grid-column: 1 / -1; }
 .sync-status{
@@ -852,20 +904,36 @@ body[data-theme="light"] .field input{ color-scheme: light; }
 }
 .sync-status.connected{ background: rgba(232,163,61,.16); color: var(--accent); }
 .sync-status.synced{ background: rgba(46,139,116,.18); color: var(--emerald-soft); }
-.link-btn{
-  border:none; background:none; color: var(--accent); text-decoration:underline;
-  font-size:.78rem; padding:0; cursor:pointer;
-}
-.config-textarea{
-  width:100%; font-family: var(--font-mono); font-size:.76rem; padding:.6rem .7rem;
-  border-radius: var(--radius-sm); border:1px solid var(--border); background: var(--bg-elevated);
-  color: var(--text); resize:vertical;
-}
 
-.rules-block{
-  display:block; margin-top:.5rem; padding:.7rem .8rem; border-radius: var(--radius-sm);
-  background: var(--bg-elevated); border:1px solid var(--border); color: var(--text-soft);
-  font-family: var(--font-mono); font-size:.72rem; line-height:1.5; overflow-x:auto; white-space:pre;
+/* ============================================================
+   AUTH GATE — full-screen login/sign-up, shown until Firebase
+   resolves the session. No config entry — Firebase auto-inits.
+   ============================================================ */
+.auth-gate{
+  position:fixed; inset:0; z-index:500; display:none; align-items:center; justify-content:center;
+  background: radial-gradient(circle at 50% 25%, var(--emerald-deep) 0%, var(--bg) 70%);
+  padding: 1.5rem;
+}
+.auth-gate.active{ display:flex; }
+.auth-gate-card{
+  width:100%; max-width: 380px; background: var(--bg-elevated); border:1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 2rem 1.8rem; box-shadow: 0 30px 70px -20px rgba(0,0,0,.55);
+  animation: popIn .4s cubic-bezier(.34,1.56,.64,1);
+}
+.auth-gate-brand{ justify-content:center; margin-bottom: 1.6rem; }
+.auth-gate-checking{ display:flex; flex-direction:column; align-items:center; gap:.9rem; padding: 1.4rem 0; color: var(--text-soft); font-size:.9rem; }
+.auth-spinner{
+  width:30px; height:30px; border-radius:50%; border:3px solid var(--track); border-top-color: var(--accent);
+  animation: authSpin .8s linear infinite;
+}
+@keyframes authSpin{ to{ transform: rotate(360deg); } }
+.auth-gate-form{ display:flex; flex-direction:column; gap:.9rem; }
+.auth-gate-form .hint{ text-align:center; margin:0 0 .2rem; }
+.auth-gate-error{ color: var(--clay); font-size:.8rem; text-align:center; min-height:1em; margin:0; }
+.auth-gate-actions{ display:flex; flex-direction:column; gap:.6rem; margin-top:.3rem; }
+.auth-gate-actions .btn-large{ align-self:stretch; justify-content:center; }
+@media (prefers-reduced-motion: reduce){
+  .auth-spinner{ animation-duration: 1.6s; }
 }
 
 </style>
@@ -877,6 +945,46 @@ body[data-theme="light"] .field input{ color-scheme: light; }
 </head>
 <body data-theme="dark">
 
+<!-- ===== AUTH GATE ===== -->
+<!-- Covers the whole app until Firebase resolves the sign-in state. Shows a
+     brief "checking session" state first (so a returning, already-logged-in
+     user never sees a login flash), then either hides itself (signed in) or
+     reveals the login/sign-up form (signed out). No configuration is ever
+     asked of the user — Firebase initializes automatically on load. -->
+<div class="auth-gate active" id="authGate">
+  <div class="auth-gate-card">
+    <div class="brand auth-gate-brand">
+      <span class="brand-mark">বি</span>
+      <div class="brand-text">
+        <strong>BCS Tracker</strong>
+        <small>Prepare with purpose</small>
+      </div>
+    </div>
+
+    <div id="authGateChecking" class="auth-gate-checking">
+      <span class="auth-spinner"></span>
+      <p>Checking your session…</p>
+    </div>
+
+    <form id="authGateForm" class="auth-gate-form" style="display:none">
+      <p class="hint" id="authGateHint">Sign in to sync your study data across every device.</p>
+      <div class="field">
+        <label for="gateEmailInput">Email</label>
+        <input type="email" id="gateEmailInput" placeholder="you@example.com" autocomplete="email" required>
+      </div>
+      <div class="field">
+        <label for="gatePasswordInput">Password</label>
+        <input type="password" id="gatePasswordInput" placeholder="At least 6 characters" autocomplete="current-password" required>
+      </div>
+      <p class="auth-gate-error" id="authGateError"></p>
+      <div class="auth-gate-actions">
+        <button type="submit" class="btn-primary btn-large" id="gateLogInBtn">Log in</button>
+        <button type="button" class="btn-secondary" id="gateSignUpBtn">Create account</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <!-- ===== TOP BAR ===== -->
 <header class="topbar">
   <div class="topbar-left">
@@ -885,35 +993,26 @@ body[data-theme="light"] .field input{ color-scheme: light; }
       <span class="burger-line"></span>
       <span class="burger-line"></span>
     </button>
-    <div class="prayer-widget" id="prayerWidget">
-      <div class="prayer-widget-head">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 3a7 7 0 1 0 8.94 9.06A8.5 8.5 0 0 1 12 3z" fill="currentColor"/></svg>
-        <span id="prayerNextLabel">Loading prayer times…</span>
-      </div>
-      <div class="prayer-widget-body" id="prayerTimesRow">
-        <span class="prayer-chip skeleton">--:--</span>
-        <span class="prayer-chip skeleton">--:--</span>
-        <span class="prayer-chip skeleton">--:--</span>
-        <span class="prayer-chip skeleton">--:--</span>
-        <span class="prayer-chip skeleton">--:--</span>
-      </div>
-    </div>
+    <button class="topbar-brand" id="topbarBrand" type="button" title="Go to Home">
+      <span class="brand-mark">বি</span>
+      <span class="topbar-brand-text">BCS Study Tracker</span>
+    </button>
   </div>
 
   <div class="topbar-center">
-    <div class="navbar-countdown nc-empty" id="navbarCountdown" title="Set your exam date in Settings">
+    <button class="navbar-countdown nc-empty" id="navbarCountdown" type="button" title="Set your exam date in Settings">
       <span class="nc-num" id="navbarCountdownNum">—</span>
-      <span class="nc-label">days to BCS</span>
-    </div>
+      <span class="nc-unit" id="navbarCountdownUnit">days to BCS</span>
+    </button>
   </div>
 
   <div class="topbar-right">
-    <div class="water-mini" id="waterMini" title="Water tracker">
+    <button class="water-mini" id="waterMini" type="button" title="Go to Water tracker">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 2s7 8.2 7 13a7 7 0 1 1-14 0c0-4.8 7-13 7-13z" fill="currentColor"/></svg>
       <div class="water-mini-track"><div class="water-mini-fill" id="waterMiniFill"></div></div>
       <span id="waterMiniText">0 / 2500 ml</span>
-      <button class="water-mini-add" id="waterQuickAdd">+250</button>
-    </div>
+      <span class="water-mini-add" id="waterQuickAdd">+250</span>
+    </button>
     <button class="icon-btn" id="themeToggle" aria-label="Toggle theme">
       <svg id="themeIconMoon" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z" fill="currentColor"/></svg>
     </button>
@@ -926,13 +1025,6 @@ body[data-theme="light"] .field input{ color-scheme: light; }
 
   <!-- ===== SIDEBAR ===== -->
   <nav class="sidebar" id="sidebar">
-    <div class="brand">
-      <span class="brand-mark">বি</span>
-      <div class="brand-text">
-        <strong>BCS Tracker</strong>
-        <small>Prepare with purpose</small>
-      </div>
-    </div>
     <ul class="nav-list">
       <li><button class="nav-item active" data-view="home"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 11.5L12 4l8 7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 10v9.5a1 1 0 0 0 1 1h3v-6h4v6h3a1 1 0 0 0 1-1V10" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg><span>Home</span></button></li>
       <li><button class="nav-item" data-view="dashboard"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 13h6V4H4v9zm0 7h6v-5H4v5zm10 0h6V11h-6v9zm0-16v5h6V4h-6z" fill="currentColor"/></svg><span>Dashboard</span></button></li>
@@ -961,6 +1053,10 @@ body[data-theme="light"] .field input{ color-scheme: light; }
 
     <!-- HOME -->
     <section class="view active" id="view-home">
+      <button class="home-new-session-btn" id="homeNewSessionBtn" type="button">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M6 4l14 8-14 8V4z" fill="currentColor"/></svg>
+        New Session
+      </button>
       <div class="home-clock" id="homeClock">
         <span class="home-clock-time" id="homeClockTime">--:--:--</span>
         <span class="home-clock-date" id="homeClockDate"></span>
@@ -977,6 +1073,12 @@ body[data-theme="light"] .field input{ color-scheme: light; }
         <p class="eyebrow">BCS Study Tracker</p>
         <h1>Prepare with purpose.</h1>
         <p class="home-tagline">Every session, revision, and habit — tracked in one calm place.</p>
+      </div>
+
+      <div class="home-daily-total" id="homeDailyTotal">
+        <span class="hdt-label">Today's study time</span>
+        <span class="hdt-time" id="homeDailyTotalTime">00:00:00</span>
+        <span class="hdt-sub">hh : mm : ss</span>
       </div>
     </section>
 
@@ -1025,7 +1127,7 @@ body[data-theme="light"] .field input{ color-scheme: light; }
 
       <!-- Quick widgets: countdown / goal progress / revisions due -->
       <div class="quick-grid">
-        <div class="panel quick-card" id="countdownCard">
+        <div class="panel quick-card countdown-hero" id="countdownCard">
           <div class="quick-card-head">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="4.5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M3 9.5h18M8 3v3M16 3v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
             <h3>BCS Countdown</h3>
@@ -1445,62 +1547,14 @@ body[data-theme="light"] .field input{ color-scheme: light; }
       <div class="panel-grid">
         <div class="panel cloud-panel" id="cloudPanel">
           <div class="panel-head">
-            <h3>Cloud Sync &amp; Login</h3>
-            <span class="sync-status" id="syncStatusBadge">● Local only</span>
+            <h3>Account &amp; Sync</h3>
+            <span class="sync-status" id="syncStatusBadge">● Checking session…</span>
           </div>
-
-          <!-- Step 1: not connected to any Firebase project yet -->
-          <div id="cloudStep1">
-            <p class="hint">
-              To sync your data across your phone and computer, connect a free Firebase project (Google's backend service — no credit card needed).
-              <button type="button" class="link-btn" id="cloudHowToBtn">How do I get this config?</button>
-            </p>
-            <ol class="howto-list" id="cloudHowToSteps" style="display:none">
-              <li>Go to <strong>console.firebase.google.com</strong> and sign in with any Google account.</li>
-              <li>Click "Add project", give it any name, and finish creation (you can skip Google Analytics).</li>
-              <li>In the left menu: <strong>Build → Authentication</strong> → "Get started" → enable the <strong>Email/Password</strong> sign-in method.</li>
-              <li>In the left menu: <strong>Build → Firestore Database</strong> → "Create database" → start in <strong>test mode</strong> (fine for a personal app) → pick any location.</li>
-              <li><strong>Important:</strong> in Firestore, open the <strong>Rules</strong> tab and replace the contents with the block below, then click Publish — this makes sure only you can read or write your own data (test mode alone allows anyone with your config to access any user's data):
-                <pre class="rules-block">rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /users/{userId} {
-      allow read, write: if request.auth != null &amp;&amp; request.auth.uid == userId;
-    }
-  }
-}</pre>
-              </li>
-              <li>Click the ⚙️ gear icon (top left, next to "Project Overview") → <strong>Project settings</strong>.</li>
-              <li>Scroll to "Your apps" → click the <strong>&lt;/&gt; (Web)</strong> icon → give it a nickname → register.</li>
-              <li>Firebase shows a code block containing <code>const firebaseConfig = &#123; ... &#125;</code> — copy just that <code>&#123; ... &#125;</code> object and paste it below.</li>
-            </ol>
-            <label for="firebaseConfigInput" class="hint" style="display:block;margin-top:.6rem">Paste your Firebase config (the JSON object from your project settings):</label>
-            <textarea id="firebaseConfigInput" class="config-textarea" rows="5" placeholder='{"apiKey": "...", "authDomain": "...", "projectId": "...", ...}'></textarea>
-            <button class="btn-primary" id="connectFirebaseBtn" style="margin-top:.6rem">Connect</button>
-          </div>
-
-          <!-- Step 2: connected to Firebase, but not signed in -->
-          <div id="cloudStep2" style="display:none">
-            <p class="hint" id="cloudConnectedHint">Connected to your Firebase project. Sign up or log in to start syncing.</p>
-            <div class="field-row">
-              <div class="field"><label for="authEmailInput">Email</label><input type="email" id="authEmailInput" placeholder="you@example.com"></div>
-              <div class="field"><label for="authPasswordInput">Password</label><input type="password" id="authPasswordInput" placeholder="At least 6 characters"></div>
-            </div>
-            <div class="settings-btn-row">
-              <button class="btn-primary" id="signUpBtn">Sign up</button>
-              <button class="btn-secondary" id="logInBtn">Log in</button>
-              <button class="btn-ghost danger" id="disconnectFirebaseBtn">Disconnect project</button>
-            </div>
-          </div>
-
-          <!-- Step 3: signed in and syncing -->
-          <div id="cloudStep3" style="display:none">
-            <p class="hint">Signed in as <strong id="signedInEmail"></strong>. Your data syncs automatically across every device you log into.</p>
-            <p class="hint" id="lastSyncedHint"></p>
-            <div class="settings-btn-row">
-              <button class="btn-secondary" id="manualSyncBtn">Sync now</button>
-              <button class="btn-ghost danger" id="logOutBtn">Log out</button>
-            </div>
+          <p class="hint">Signed in as <strong id="signedInEmail"></strong>. Your data syncs automatically across every device you log into.</p>
+          <p class="hint" id="lastSyncedHint"></p>
+          <div class="settings-btn-row">
+            <button class="btn-secondary" id="manualSyncBtn">Sync now</button>
+            <button class="btn-ghost danger" id="logOutBtn">Log out</button>
           </div>
         </div>
         <div class="panel">
@@ -1747,7 +1801,8 @@ const DEFAULT_SETTINGS = {
   notifEnabled: false,
   alarmSound: true,
   examDate: null,
-  sleepGoal: 8
+  sleepGoal: 8,
+  lastCountdownPopupDate: null
 };
 const DEFAULT_GOALS = {
   daily: { hours: 2, revisions: 3 },
@@ -1795,63 +1850,74 @@ function savePrayerCompletion() { DB.write(DB.keys.prayerCompletion, state.praye
 function saveUnlockedAchievements() { DB.write(DB.keys.unlockedAchievements, state.unlockedAchievements); Cloud.scheduleSync(); }
 
 /* ============================================================
-   CLOUD SYNC & LOGIN (optional, opt-in)
-   Powered by the user's own free Firebase project — nothing here
-   activates unless they paste a config in Settings → Cloud Sync.
-   Without it, the app behaves exactly as pure local storage, same
-   as before. One Firestore document per user holds the whole
-   app state; every local save schedules a debounced push, and a
-   realtime listener pulls down changes made from other devices.
+   CLOUD SYNC & LOGIN (production)
+   Firebase initializes automatically on load — no setup step, no
+   config entry, ever. Authentication is required to use the app;
+   a full-screen gate (#authGate) blocks the UI until Firebase
+   resolves the session. Persistence is LOCAL, so a returning user
+   stays signed in across closes/reopens on the same browser. One
+   Firestore document per user holds the whole app state; every
+   local save schedules a debounced push, and a realtime listener
+   pulls down changes made from other devices.
    ============================================================ */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyA7Z_1vMT1VjdTcbD0bRQ6B0Y2qW25kmss",
+  authDomain: "bcs-study-tracker.firebaseapp.com",
+  projectId: "bcs-study-tracker",
+  storageBucket: "bcs-study-tracker.firebasestorage.app",
+  messagingSenderId: "676894280469",
+  appId: "1:676894280469:web:e62fa90ce823a14994371c",
+  measurementId: "G-7NX623YF0W"
+};
+
 const Cloud = {
   app: null, auth: null, db: null, user: null,
   unsubscribeSnapshot: null, syncTimer: null, applyingRemote: false,
-  configKey: 'bcs_firebase_config',
+  legacyConfigKey: 'bcs_firebase_config', // pre-production key; migrated away automatically below
 
-  init() {
-    const saved = DB.read(this.configKey, null);
-    if (!saved) { this.renderStep(1); updateSyncBadge('local'); return; }
-    this.connect(saved, true);
-  },
+  async init() {
+    // Migrate away from the old "paste your config" workflow: if a config was
+    // ever saved locally from a previous version, it's no longer needed (the
+    // app now ships with its own) — remove it so it can't linger or conflict.
+    if (localStorage.getItem(this.legacyConfigKey)) {
+      localStorage.removeItem(this.legacyConfigKey);
+    }
 
-  connect(configObj, silent) {
+    if (typeof firebase === 'undefined') {
+      console.error('Firebase SDK failed to load.');
+      updateSyncBadge('error');
+      showAuthGateForm('Could not reach the login service. Check your internet connection and reload.');
+      return;
+    }
+
     try {
-      if (typeof firebase === 'undefined') { toast('Firebase failed to load — check your internet connection and try again.'); return; }
-      this.app = firebase.apps && firebase.apps.length ? firebase.app() : firebase.initializeApp(configObj);
+      this.app = firebase.apps && firebase.apps.length ? firebase.app() : firebase.initializeApp(FIREBASE_CONFIG);
       this.auth = firebase.auth();
       this.db = firebase.firestore();
-      DB.write(this.configKey, configObj);
+      await this.auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
       this.auth.onAuthStateChanged(user => this.onAuthChange(user));
-      if (!silent) toast('Connected to your Firebase project.');
     } catch (e) {
       console.error(e);
-      toast('Could not connect — check that you pasted the full config object correctly.');
+      updateSyncBadge('error');
+      showAuthGateForm('Something went wrong starting the login service. Please reload the page.');
     }
   },
 
-  disconnect() {
-    if (!confirm("Disconnect this Firebase project? Your data stays on this device, but sync stops until you reconnect.")) return;
-    if (this.unsubscribeSnapshot) { this.unsubscribeSnapshot(); this.unsubscribeSnapshot = null; }
-    if (this.auth) this.auth.signOut().catch(() => {});
-    localStorage.removeItem(this.configKey);
-    this.app = null; this.auth = null; this.db = null; this.user = null;
-    this.renderStep(1);
-    updateSyncBadge('local');
-  },
-
   async signUp(email, password) {
-    if (!email || !password) { toast('Enter an email and password first.'); return; }
-    try { await this.auth.createUserWithEmailAndPassword(email, password); toast('Account created — signed in.'); }
-    catch (e) { toast(this.friendlyError(e)); }
+    if (!email || !password) { setAuthGateError('Enter an email and password.'); return; }
+    setAuthGateError('');
+    try { await this.auth.createUserWithEmailAndPassword(email, password); }
+    catch (e) { setAuthGateError(this.friendlyError(e)); }
   },
   async logIn(email, password) {
-    if (!email || !password) { toast('Enter an email and password first.'); return; }
-    try { await this.auth.signInWithEmailAndPassword(email, password); toast('Signed in.'); }
-    catch (e) { toast(this.friendlyError(e)); }
+    if (!email || !password) { setAuthGateError('Enter an email and password.'); return; }
+    setAuthGateError('');
+    try { await this.auth.signInWithEmailAndPassword(email, password); }
+    catch (e) { setAuthGateError(this.friendlyError(e)); }
   },
   async logOut() {
     if (this.unsubscribeSnapshot) { this.unsubscribeSnapshot(); this.unsubscribeSnapshot = null; }
-    try { await this.auth.signOut(); toast('Signed out. Your data stays on this device.'); }
+    try { await this.auth.signOut(); toast('Signed out.'); }
     catch (e) { toast(this.friendlyError(e)); }
   },
   friendlyError(e) {
@@ -1869,10 +1935,14 @@ const Cloud = {
 
   async onAuthChange(user) {
     this.user = user;
-    if (!user) { this.renderStep(this.auth ? 2 : 1); updateSyncBadge('local'); return; }
+    if (!user) {
+      updateSyncBadge('local');
+      showAuthGateForm('');
+      return;
+    }
+    hideAuthGate();
     const emailEl = document.getElementById('signedInEmail');
     if (emailEl) emailEl.textContent = user.email;
-    this.renderStep(3);
     await this.initialSync();
     this.listenForRemoteChanges();
   },
@@ -1895,7 +1965,7 @@ const Cloud = {
     } catch (e) {
       console.error(e);
       updateSyncBadge('error');
-      toast('Cloud sync failed — double check your Firestore database was created.');
+      toast('Cloud sync failed — check your connection and try "Sync now" in Settings.');
     }
   },
 
@@ -1942,16 +2012,23 @@ const Cloud = {
       console.error(e);
       updateSyncBadge('error');
     }
-  },
-
-  renderStep(n) {
-    const s1 = document.getElementById('cloudStep1'), s2 = document.getElementById('cloudStep2'), s3 = document.getElementById('cloudStep3');
-    if (!s1 || !s2 || !s3) return;
-    s1.style.display = n === 1 ? 'block' : 'none';
-    s2.style.display = n === 2 ? 'block' : 'none';
-    s3.style.display = n === 3 ? 'block' : 'none';
   }
 };
+
+/* ---- Auth gate UI helpers ---- */
+function showAuthGateForm(errorMsg) {
+  document.getElementById('authGate').classList.add('active');
+  document.getElementById('authGateChecking').style.display = 'none';
+  document.getElementById('authGateForm').style.display = 'flex';
+  if (errorMsg) setAuthGateError(errorMsg);
+}
+function hideAuthGate() {
+  document.getElementById('authGate').classList.remove('active');
+}
+function setAuthGateError(msg) {
+  const el = document.getElementById('authGateError');
+  if (el) el.textContent = msg || '';
+}
 
 function updateSyncBadge(status) {
   const el = document.getElementById('syncStatusBadge');
@@ -1960,7 +2037,7 @@ function updateSyncBadge(status) {
   if (status === 'syncing') { el.textContent = '● Syncing…'; el.classList.add('connected'); }
   else if (status === 'synced') { el.textContent = '☁ Synced'; el.classList.add('synced'); }
   else if (status === 'error') { el.textContent = '⚠ Sync error'; el.classList.add('connected'); }
-  else { el.textContent = '● Local only'; }
+  else { el.textContent = '● Signed out'; }
 }
 
 function saveAllLocal() {
@@ -1991,25 +2068,12 @@ function refreshEverything() {
 function initCloudSync() {
   Cloud.init();
 
-  document.getElementById('cloudHowToBtn').addEventListener('click', () => {
-    const el = document.getElementById('cloudHowToSteps');
-    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+  document.getElementById('authGateForm').addEventListener('submit', e => {
+    e.preventDefault();
+    Cloud.logIn(document.getElementById('gateEmailInput').value.trim(), document.getElementById('gatePasswordInput').value);
   });
-  document.getElementById('connectFirebaseBtn').addEventListener('click', () => {
-    const raw = document.getElementById('firebaseConfigInput').value.trim();
-    if (!raw) { toast('Paste your Firebase config first.'); return; }
-    let parsed;
-    try { parsed = JSON.parse(raw); }
-    catch (e) { toast('That doesn\'t look like valid JSON — make sure you copied the full { ... } object.'); return; }
-    Cloud.connect(parsed, false);
-    Cloud.renderStep(2);
-  });
-  document.getElementById('disconnectFirebaseBtn').addEventListener('click', () => Cloud.disconnect());
-  document.getElementById('signUpBtn').addEventListener('click', () => {
-    Cloud.signUp(document.getElementById('authEmailInput').value.trim(), document.getElementById('authPasswordInput').value);
-  });
-  document.getElementById('logInBtn').addEventListener('click', () => {
-    Cloud.logIn(document.getElementById('authEmailInput').value.trim(), document.getElementById('authPasswordInput').value);
+  document.getElementById('gateSignUpBtn').addEventListener('click', () => {
+    Cloud.signUp(document.getElementById('gateEmailInput').value.trim(), document.getElementById('gatePasswordInput').value);
   });
   document.getElementById('logOutBtn').addEventListener('click', () => Cloud.logOut());
   document.getElementById('manualSyncBtn').addEventListener('click', () => { Cloud.pushNow(); toast('Sync requested.'); });
@@ -2115,6 +2179,19 @@ function playWaterChime() {
   beep(520, 0.2, 0, 0.1);
   beep(660, 0.25, 0.16, 0.1);
 }
+function playAzanChime() {
+  // A gentle, original synthesized melody for the prayer reminder — rising
+  // then resolving back down, meant to feel calm and call-like. This is NOT
+  // a recording of an actual azan (I have no way to source or license real
+  // azan audio here) — just a respectful, soft original tone sequence.
+  if (!state.settings.alarmSound) return;
+  const notes = [392.0, 440.0, 493.88, 523.25, 493.88, 440.0, 392.0];
+  let t = 0;
+  notes.forEach(freq => { beep(freq, 0.95, t, 0.15, 'sine'); t += 0.58; });
+  if (navigator.vibrate) {
+    try { navigator.vibrate([250, 120, 250]); } catch (e) { /* ignore */ }
+  }
+}
 
 function updateNotifHint() {
   const hint = document.getElementById('notifHint');
@@ -2154,14 +2231,43 @@ function initTheme() {
   });
 }
 
+// Bangladesh Standard Time (UTC+6, no DST) — used for the home clock and the
+// "today" boundary shown on the home screen, regardless of the device's own
+// timezone setting. (The astronomical prayer-time calculation still uses the
+// device's actual location/offset on purpose — that has to match wherever
+// the phone's GPS says the person actually is.)
+function nowBDT() {
+  return new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Dhaka' }));
+}
+function dateKeyBDT() { return dateKey(nowBDT()); }
+
 function initHomeClock() {
   const timeEl = document.getElementById('homeClockTime');
   const dateEl = document.getElementById('homeClockDate');
   if (!timeEl || !dateEl) return;
   function tick() {
-    const now = new Date();
-    timeEl.textContent = now.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    dateEl.textContent = now.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+    const bdt = nowBDT();
+    timeEl.textContent = bdt.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+    dateEl.textContent = bdt.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }) + ' · BDT';
+  }
+  tick();
+  setInterval(tick, 1000);
+}
+
+function initHomeDailyTotal() {
+  const el = document.getElementById('homeDailyTotalTime');
+  if (!el) return;
+  function tick() {
+    const todayKey = dateKeyBDT();
+    let totalSeconds = completedSessions().filter(s => s.date === todayKey).reduce((a, s) => a + s.actualMinutes, 0) * 60;
+    if (Focus.active && !Focus.paused && dateKey(new Date(Focus.startedAt)) === dateKey(new Date())) {
+      totalSeconds += (Focus.totalSeconds - Focus.remainingNow());
+    }
+    totalSeconds = Math.max(0, Math.round(totalSeconds));
+    const h = Math.floor(totalSeconds / 3600);
+    const m = Math.floor((totalSeconds % 3600) / 60);
+    const s = totalSeconds % 60;
+    el.textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
   }
   tick();
   setInterval(tick, 1000);
@@ -2209,6 +2315,9 @@ function initNav() {
   document.querySelectorAll('[data-view-link]').forEach(el => {
     el.addEventListener('click', () => goToView(el.dataset.viewLink));
   });
+
+  document.getElementById('homeNewSessionBtn').addEventListener('click', () => goToView('session'));
+  document.getElementById('topbarBrand').addEventListener('click', () => goToView('home'));
 }
 function goToView(name) {
   document.querySelector(`.nav-item[data-view="${name}"]`).click();
@@ -2797,7 +2906,9 @@ let reminderAutoHideTimer = null;
 function showFullscreenReminder({ type, title, message, icon }) {
   if (typeof Focus !== 'undefined' && Focus.active) return; // don't interrupt an active session
   const overlay = document.getElementById('reminderOverlay');
-  overlay.classList.toggle('theme-water', type === 'water');
+  overlay.classList.remove('theme-water', 'theme-countdown');
+  if (type === 'water') overlay.classList.add('theme-water');
+  if (type === 'countdown') overlay.classList.add('theme-countdown');
   document.getElementById('reminderIcon').textContent = icon;
   document.getElementById('reminderTitle').textContent = title;
   document.getElementById('reminderMsg').textContent = message;
@@ -3143,7 +3254,11 @@ function initWaterTracker() {
   document.getElementById('waterCupInput').value = state.settings.water.cup;
   document.getElementById('waterReminderInput').value = state.settings.water.reminder;
 
-  document.getElementById('waterQuickAdd').addEventListener('click', () => addWater(state.settings.water.cup));
+  document.getElementById('waterQuickAdd').addEventListener('click', e => {
+    e.stopPropagation();
+    addWater(state.settings.water.cup);
+  });
+  document.getElementById('waterMini').addEventListener('click', () => goToView('health'));
   document.getElementById('waterAddCup').addEventListener('click', () => addWater(state.settings.water.cup));
   document.getElementById('waterUndo').addEventListener('click', undoLastWater);
 
@@ -3231,37 +3346,14 @@ const Prayer = {
 
   refresh() {
     const p = state.settings.prayer;
-    if (p.lat == null || p.lon == null) { this.renderUnavailable(); return; }
+    if (p.lat == null || p.lon == null) { this.times = null; return; }
     const now = new Date();
     const tz = -now.getTimezoneOffset() / 60;
     this.times = this.compute(now, p.lat, p.lon, tz);
     this.lastComputedKey = dateKey(now);
-    this.render();
-  },
-
-  renderUnavailable() {
-    document.getElementById('prayerNextLabel').textContent = 'Enable location for prayer times';
-    document.getElementById('prayerTimesRow').innerHTML = `<span class="prayer-chip skeleton">--:--</span>`.repeat(5);
-  },
-
-  render() {
-    if (!this.times) return;
-    const order = ['fajr', 'sunrise', 'dhuhr', 'asr', 'maghrib', 'isha'];
-    const labels = { fajr: 'Fajr', sunrise: 'Sunrise', dhuhr: 'Dhuhr', asr: 'Asr', maghrib: 'Maghrib', isha: 'Isha' };
-    const now = new Date();
-    const nowH = now.getHours() + now.getMinutes() / 60;
-
-    // find next prayer among the 5 obligatory ones
-    const obligatory = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
-    let next = obligatory.find(k => this.times[k] > nowH);
-    if (!next) next = 'fajr';
-
-    document.getElementById('prayerNextLabel').textContent =
-      `${labels[next]} ${next === 'fajr' && !obligatory.find(k => this.times[k] > nowH) ? 'tomorrow' : ''} at ${fmt12(this.times[next])}`;
-
-    document.getElementById('prayerTimesRow').innerHTML = obligatory.map(k => `
-      <span class="prayer-chip ${k === next ? 'active' : ''}" title="${labels[k]}">${labels[k].slice(0,3)} ${fmt12(this.times[k]).replace(' ', '')}</span>
-    `).join('');
+    // no topbar widget to render anymore — this.times still feeds reminders
+    // and the Health page's prayer-completion checklist.
+    if (document.getElementById('view-health').classList.contains('active')) renderHealthView();
   },
 
   checkReminders() {
@@ -3283,7 +3375,7 @@ const Prayer = {
       // reminder N minutes before this waqt
       if (nowH >= t - reminderH && nowH < t && !this.notifiedToday.has(beforeKey)) {
         this.notifiedToday.add(beforeKey);
-        playSoftChime();
+        playAzanChime();
         notify('Prayer reminder', `${labels[k]} is in ${state.settings.prayer.reminderMin} minutes (${fmt12(t)}).`);
         showFullscreenReminder({
           type: 'prayer', icon: '🕌', title: `${labels[k]} in ${state.settings.prayer.reminderMin} min`,
@@ -3293,11 +3385,11 @@ const Prayer = {
       // notification exactly at the start of this waqt — fires for every one of the 5 prayers
       if (nowH >= t && nowH < t + windowH && !this.notifiedAtTime.has(atKey)) {
         this.notifiedAtTime.add(atKey);
-        playSoftChime();
+        playAzanChime();
         notify('Prayer time', `It's time for ${labels[k]} (${fmt12(t)}).`);
         showFullscreenReminder({
           type: 'prayer', icon: '🕌', title: `It's time for ${labels[k]}`,
-          message: `${labels[k]} has begun (${fmt12(t)}).`
+          message: `A moment of peace awaits — take time for ${labels[k]} (${fmt12(t)}).`
         });
       }
     });
@@ -3956,32 +4048,76 @@ function renderCountdownWidget() {
   else if (currentPace < recommendedDaily * 0.85) { paceClass = 'pace-behind'; paceLabel = 'Behind pace'; }
 
   body.innerHTML = `
-    <span class="countdown-num">${daysRemaining}</span>
+    <span class="countdown-num" id="countdownNumVal">0</span>
     <span class="countdown-sub">day${daysRemaining === 1 ? '' : 's'} remaining · ${examDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
     <span class="countdown-sub">Suggested pace: ${recommendedDaily.toFixed(1)}h/day (you're averaging ${currentPace.toFixed(1)}h/day)</span>
     <span class="countdown-pace ${paceClass}">${paceLabel}</span>
   `;
+  animateCountUp(document.getElementById('countdownNumVal'), daysRemaining);
+}
+function animateCountUp(el, target, duration) {
+  if (!el) return;
+  duration = duration || 900;
+  const startTime = performance.now();
+  function tick(now) {
+    const progress = Math.min(1, (now - startTime) / duration);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.round(target * eased);
+    if (progress < 1) requestAnimationFrame(tick);
+    else el.textContent = target;
+  }
+  requestAnimationFrame(tick);
 }
 
 function renderNavbarCountdown() {
   const el = document.getElementById('navbarCountdown');
   const numEl = document.getElementById('navbarCountdownNum');
-  if (!el || !numEl) return;
+  const unitEl = document.getElementById('navbarCountdownUnit');
+  if (!el || !numEl || !unitEl) return;
   const dateStr = state.settings.examDate;
   if (!dateStr) {
     numEl.textContent = '—';
+    unitEl.textContent = 'set exam date';
     el.classList.add('nc-empty');
     el.title = 'Set your target exam date in Settings';
     el.onclick = () => goToView('settings');
     return;
   }
-  const examDate = stripTime(new Date(dateStr));
-  const today = stripTime(new Date());
-  const daysRemaining = Math.round((examDate - today) / 86400000);
+  const targetEndOfDay = stripTime(new Date(dateStr)).getTime() + 24 * 3600000;
+  const nowMs = nowBDT().getTime();
+  const diffMs = targetEndOfDay - nowMs;
   el.classList.remove('nc-empty');
-  el.title = `Target exam date: ${examDate.toLocaleDateString()}`;
+  el.title = `Target exam date: ${new Date(dateStr).toLocaleDateString()} (BDT)`;
   el.onclick = () => goToView('dashboard');
-  numEl.textContent = daysRemaining >= 0 ? daysRemaining : 'Passed';
+
+  if (diffMs <= 0) {
+    numEl.textContent = '0';
+    unitEl.textContent = 'exam day passed';
+    return;
+  }
+  const days = Math.floor(diffMs / 86400000);
+  const hours = Math.floor((diffMs % 86400000) / 3600000);
+  numEl.textContent = `${days}d ${hours}h`;
+  unitEl.textContent = 'to BCS';
+}
+
+function maybeShowDailyCountdownPopup() {
+  if (!state.settings.examDate) return;
+  const todayKey = dateKeyBDT();
+  if (state.settings.lastCountdownPopupDate === todayKey) return;
+  if (typeof Focus !== 'undefined' && Focus.active) return; // don't interrupt an active session
+  const targetEndOfDay = stripTime(new Date(state.settings.examDate)).getTime() + 24 * 3600000;
+  const diffMs = targetEndOfDay - nowBDT().getTime();
+  state.settings.lastCountdownPopupDate = todayKey;
+  saveSettings();
+  if (diffMs <= 0) return;
+  const days = Math.floor(diffMs / 86400000);
+  const hours = Math.floor((diffMs % 86400000) / 3600000);
+  showFullscreenReminder({
+    type: 'countdown', icon: '📅',
+    title: `${days} day${days === 1 ? '' : 's'}, ${hours}h to the BCS`,
+    message: "A new day of preparation has begun — make today count."
+  });
 }
 
 /* ============================================================
@@ -4406,6 +4542,7 @@ function initSettingsView() {
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   initHomeClock();
+  initHomeDailyTotal();
   initNav();
   initModal();
   initSessionForm();
@@ -4424,6 +4561,10 @@ document.addEventListener('DOMContentLoaded', () => {
   Revision.checkAndNotify();
   setInterval(() => Revision.checkAndNotify(), 60 * 60000);
   renderDashboard();
+  renderNavbarCountdown();
+  setInterval(renderNavbarCountdown, 60000);
+  setTimeout(maybeShowDailyCountdownPopup, 2500);
+  setInterval(maybeShowDailyCountdownPopup, 15 * 60000);
 });
 
 </script>
