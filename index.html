@@ -936,6 +936,52 @@ img, svg, canvas{ max-width: 100%; }
   .auth-spinner{ animation-duration: 1.6s; }
 }
 
+/* ============================================================
+   HEALTH — Habit Analytics (water / sleep / prayer trends)
+   ============================================================ */
+.health-chart-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:.9rem; margin-top:.8rem; }
+.health-chart-card{ background: var(--surface-2); border:1px solid var(--border); border-radius: var(--radius-md); padding:.9rem 1rem; }
+.health-chart-card-head{ display:flex; justify-content:space-between; align-items:baseline; font-size:.82rem; font-weight:600; margin-bottom:.5rem; }
+.health-chart-avg{ font-family: var(--font-mono); font-size:.74rem; font-weight:600; color: var(--primary); }
+.health-streaks-row{ display:flex; gap:.6rem; flex-wrap:wrap; margin-top:1rem; }
+.habit-streak-chip{
+  display:flex; align-items:center; gap:.4rem; padding:.5rem .8rem; border-radius: var(--radius-sm);
+  background: var(--accent-soft); color: var(--accent); font-size:.78rem; font-weight:600;
+}
+.habit-streak-chip .streak-icon{ font-size:1rem; }
+
+.sleep-computed-row{
+  display:flex; align-items:center; justify-content:space-between; padding:.6rem .8rem; margin:.7rem 0;
+  border-radius: var(--radius-sm); background: var(--surface-2); font-size:.85rem; color: var(--text-soft);
+}
+.sleep-computed-row strong{ font-family: var(--font-mono); font-size:1.05rem; color: var(--primary); }
+
+@media (max-width: 900px){
+  .health-chart-grid{ grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   DASHBOARD — Study Breakdown card
+   ============================================================ */
+.breakdown-window-label{ font-size:.78rem; color: var(--text-faint); margin-bottom:.9rem; }
+.breakdown-subject{ margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px dashed var(--border); }
+.breakdown-subject:last-of-type{ border-bottom:none; margin-bottom:0; padding-bottom:0; }
+.breakdown-subject-head{ display:flex; align-items:center; gap:.5rem; margin-bottom:.4rem; flex-wrap:wrap; }
+.breakdown-subject-head strong{ font-size:.9rem; }
+.breakdown-subject-head span{ margin-left:auto; font-family: var(--font-mono); font-size:.78rem; color: var(--primary); }
+.breakdown-tag{ font-size:.62rem; font-weight:700; text-transform:uppercase; letter-spacing:.03em; padding:.15rem .5rem; border-radius:999px; }
+.tag-strong{ background: rgba(46,139,116,.18); color: var(--emerald-soft); }
+.tag-weak{ background: rgba(196,86,46,.18); color: var(--clay); }
+.breakdown-topics{ display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.6rem; }
+.breakdown-topic-chip{
+  font-size:.72rem; padding:.25rem .55rem; border-radius:999px; background: var(--surface-2);
+  color: var(--text-soft); border:1px solid var(--border);
+}
+.breakdown-insight{
+  margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border);
+  display:flex; flex-direction:column; gap:.35rem; font-size:.82rem;
+}
+
 </style>
 <!-- Firebase (compat build) — used only if the user connects their own free Firebase project
      in Settings → Cloud Sync. Loading these scripts does nothing on its own. -->
@@ -1178,6 +1224,21 @@ img, svg, canvas{ max-width: 100%; }
           <span>Less</span>
           <span class="heat-cell heat-0"></span><span class="heat-cell heat-1"></span><span class="heat-cell heat-2"></span><span class="heat-cell heat-3"></span><span class="heat-cell heat-4"></span>
           <span>More</span>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:1rem">
+        <div class="panel-head">
+          <h3>Study breakdown</h3>
+          <div class="range-switch" id="breakdownRange">
+            <button class="range-btn active" data-range="daily">Daily</button>
+            <button class="range-btn" data-range="weekly">Weekly</button>
+            <button class="range-btn" data-range="monthly">Monthly</button>
+            <button class="range-btn" data-range="yearly">Yearly</button>
+          </div>
+        </div>
+        <div id="studyBreakdownBody">
+          <p class="empty-state">No sessions logged yet.</p>
         </div>
       </div>
 
@@ -1522,9 +1583,19 @@ img, svg, canvas{ max-width: 100%; }
           <div class="panel-head"><h3>Sleep tracker</h3></div>
           <div class="field-row">
             <div class="field">
-              <label for="sleepHoursInput">Hours slept last night</label>
-              <input type="number" id="sleepHoursInput" min="0" max="16" step="0.25">
+              <label for="bedTimeInput">Went to bed at</label>
+              <input type="time" id="bedTimeInput">
             </div>
+            <div class="field">
+              <label for="wakeTimeInput">Woke up at</label>
+              <input type="time" id="wakeTimeInput">
+            </div>
+          </div>
+          <div class="sleep-computed-row" id="sleepComputedRow">
+            <span>Sleep duration</span>
+            <strong id="sleepComputedHours">—</strong>
+          </div>
+          <div class="field-row">
             <div class="field">
               <label for="sleepGoalInput">Daily sleep goal (hours)</label>
               <input type="number" id="sleepGoalInput" min="1" max="14" step="0.5" value="8">
@@ -1533,6 +1604,43 @@ img, svg, canvas{ max-width: 100%; }
           <button class="btn-primary" id="saveSleepBtn">Save sleep</button>
           <p class="hint" id="wellnessSummary"></p>
         </div>
+      </div>
+
+      <!-- HABIT ANALYTICS -->
+      <div class="panel" style="margin-top:1rem">
+        <div class="panel-head">
+          <h3>Habit analytics</h3>
+          <div class="range-switch" id="healthRange">
+            <button class="range-btn active" data-range="daily">Daily</button>
+            <button class="range-btn" data-range="weekly">Weekly</button>
+            <button class="range-btn" data-range="monthly">Monthly</button>
+            <button class="range-btn" data-range="yearly">Yearly</button>
+          </div>
+        </div>
+        <div class="health-chart-grid">
+          <div class="health-chart-card">
+            <div class="health-chart-card-head">
+              <span>💧 Water</span>
+              <span class="health-chart-avg" id="waterAvgLabel">—</span>
+            </div>
+            <canvas id="waterChart" height="140"></canvas>
+          </div>
+          <div class="health-chart-card">
+            <div class="health-chart-card-head">
+              <span>😴 Sleep</span>
+              <span class="health-chart-avg" id="sleepAvgLabel">—</span>
+            </div>
+            <canvas id="sleepChart" height="140"></canvas>
+          </div>
+          <div class="health-chart-card">
+            <div class="health-chart-card-head">
+              <span>🕌 Prayer</span>
+              <span class="health-chart-avg" id="prayerAvgLabel">—</span>
+            </div>
+            <canvas id="prayerChart" height="140"></canvas>
+          </div>
+        </div>
+        <div class="health-streaks-row" id="healthStreaksRow"></div>
       </div>
     </section>
 
@@ -3030,6 +3138,7 @@ function renderDashboard() {
   renderGoalCardMini();
   renderRevisionDueWidget();
   renderHeatmap();
+  renderStudyBreakdown();
   renderAchievementsStrip();
   renderWeakSuggestions();
   Achievements.checkNew();
@@ -3051,10 +3160,11 @@ function renderDashboardChart() {
   drawBarChart(document.getElementById('mainChart'), labels, values);
 }
 
-function drawBarChart(canvas, labels, values) {
+function drawBarChart(canvas, labels, values, opts) {
+  opts = opts || {};
   const dpr = window.devicePixelRatio || 1;
   const cssWidth = canvas.parentElement.clientWidth - 2;
-  const cssHeight = 220;
+  const cssHeight = opts.height || 220;
   canvas.width = cssWidth * dpr;
   canvas.height = cssHeight * dpr;
   canvas.style.width = cssWidth + 'px';
@@ -3063,10 +3173,12 @@ function drawBarChart(canvas, labels, values) {
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, cssWidth, cssHeight);
 
-  const padLeft = 34, padBottom = 26, padTop = 14, padRight = 6;
+  const padLeft = opts.padLeft != null ? opts.padLeft : 34;
+  const padBottom = 26, padTop = 14, padRight = 6;
   const chartW = cssWidth - padLeft - padRight;
   const chartH = cssHeight - padTop - padBottom;
   const maxVal = Math.max(1, ...values) * 1.15;
+  const formatVal = opts.valueFormatter || (v => v.toFixed(1));
 
   const textFaint = cssVar('--text-faint') || '#8A9791';
   const track = cssVar('--track') || '#e9e1cf';
@@ -3077,7 +3189,7 @@ function drawBarChart(canvas, labels, values) {
   ctx.lineWidth = 1;
   ctx.font = '10px "IBM Plex Sans", sans-serif';
   ctx.fillStyle = textFaint;
-  const gridLines = 4;
+  const gridLines = opts.gridLines != null ? opts.gridLines : 4;
   for (let i = 0; i <= gridLines; i++) {
     const y = padTop + (chartH / gridLines) * i;
     ctx.beginPath();
@@ -3085,12 +3197,12 @@ function drawBarChart(canvas, labels, values) {
     ctx.lineTo(padLeft + chartW, y);
     ctx.stroke();
     const val = maxVal - (maxVal / gridLines) * i;
-    ctx.fillText(val.toFixed(1), 2, y + 3);
+    ctx.fillText(formatVal(val), 2, y + 3);
   }
 
   const n = values.length || 1;
   const slot = chartW / n;
-  const barWidth = Math.min(30, slot * 0.55);
+  const barWidth = Math.min(opts.maxBarWidth || 30, slot * 0.55);
 
   values.forEach((v, i) => {
     const x = padLeft + slot * i + (slot - barWidth) / 2;
@@ -3121,17 +3233,86 @@ function roundRectTop(ctx, x, y, w, h, r) {
 }
 
 function initDashboard() {
-  document.querySelectorAll('.range-btn').forEach(btn => {
+  document.querySelectorAll('#dashRange .range-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('#dashRange .range-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       currentRange = btn.dataset.range;
       renderDashboardChart();
     });
   });
-  window.addEventListener('resize', debounce(() => renderDashboardChart(), 200));
+  document.getElementById('breakdownRange').addEventListener('click', e => {
+    const btn = e.target.closest('.range-btn');
+    if (!btn) return;
+    document.querySelectorAll('#breakdownRange .range-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    breakdownRange = btn.dataset.range;
+    renderStudyBreakdown();
+  });
+  window.addEventListener('resize', debounce(() => { renderDashboardChart(); renderHealthAnalytics(); }, 200));
 }
 function debounce(fn, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), wait); }; }
+
+/* ---- Study Breakdown card: ranked subject/topic time with auto-analysis ---- */
+let breakdownRange = 'daily';
+function getRangeWindow(range) {
+  const now = new Date();
+  if (range === 'daily') return { start: dateKey(now), end: dateKey(now), label: 'Today' };
+  if (range === 'weekly') return { start: dateKey(addDays(now, -6)), end: dateKey(now), label: 'Last 7 days' };
+  if (range === 'monthly') return { start: dateKey(new Date(now.getFullYear(), now.getMonth(), 1)), end: dateKey(now), label: 'This month' };
+  return { start: dateKey(new Date(now.getFullYear(), 0, 1)), end: dateKey(now), label: 'This year' };
+}
+function renderStudyBreakdown() {
+  const body = document.getElementById('studyBreakdownBody');
+  if (!body) return;
+  const win = getRangeWindow(breakdownRange);
+  const cs = completedSessions().filter(s => s.date >= win.start && s.date <= win.end);
+
+  if (!cs.length) {
+    body.innerHTML = `<p class="empty-state">No sessions logged ${win.label.toLowerCase()}.</p>`;
+    return;
+  }
+
+  const bySubject = {};
+  cs.forEach(s => {
+    bySubject[s.subject] = bySubject[s.subject] || { total: 0, topics: {} };
+    bySubject[s.subject].total += s.actualMinutes;
+    bySubject[s.subject].topics[s.topic] = (bySubject[s.subject].topics[s.topic] || 0) + s.actualMinutes;
+  });
+  const entries = Object.entries(bySubject).sort((a, b) => b[1].total - a[1].total);
+  const totalMinutes = cs.reduce((a, s) => a + s.actualMinutes, 0);
+  const avgMinutes = totalMinutes / entries.length;
+  const maxMinutes = entries[0][1].total;
+
+  // Only classify strong/weak when there's more than one subject to compare against
+  const strong = entries.length > 1 ? entries.filter(([, d]) => d.total >= avgMinutes * 1.15).map(([s]) => s) : [];
+  const weak = entries.length > 1 ? entries.filter(([, d]) => d.total <= avgMinutes * 0.6).map(([s]) => s) : [];
+
+  let html = `<p class="breakdown-window-label">${win.label} · ${entries.length} subject${entries.length === 1 ? '' : 's'} · ${fmtDuration(totalMinutes)} total</p>`;
+  html += entries.map(([subject, data]) => {
+    const topics = Object.entries(data.topics).sort((a, b) => b[1] - a[1]);
+    const pct = Math.round((data.total / maxMinutes) * 100);
+    const tag = strong.includes(subject) ? '<span class="breakdown-tag tag-strong">Strong</span>'
+      : weak.includes(subject) ? '<span class="breakdown-tag tag-weak">Needs attention</span>' : '';
+    return `
+      <div class="breakdown-subject">
+        <div class="breakdown-subject-head">
+          <strong>${escapeHtml(subject)}</strong> ${tag}
+          <span>${fmtDuration(data.total)}</span>
+        </div>
+        <div class="subject-bar-track"><div class="subject-bar-fill" style="width:${pct}%"></div></div>
+        <div class="breakdown-topics">${topics.slice(0, 5).map(([t, m]) => `<span class="breakdown-topic-chip">${escapeHtml(t)} · ${fmtDuration(m)}</span>`).join('')}</div>
+      </div>`;
+  }).join('');
+
+  if (strong.length || weak.length) {
+    html += '<div class="breakdown-insight">';
+    if (strong.length) html += `<p>💪 Strongest ${win.label.toLowerCase()}: <strong>${strong.slice(0, 3).map(escapeHtml).join(', ')}</strong></p>`;
+    if (weak.length) html += `<p>⚠️ Could use more attention: <strong>${weak.slice(0, 3).map(escapeHtml).join(', ')}</strong></p>`;
+    html += '</div>';
+  }
+  body.innerHTML = html;
+}
 
 /* ============================================================
    SUBJECT ANALYTICS
@@ -4370,13 +4551,41 @@ function generateReport(period) {
 }
 
 /* ============================================================
-   HEALTH — Prayer completion, Sleep tracker, Health score
+   HEALTH — Prayer completion, Sleep tracker, Health score,
+   and Habit Analytics (daily/weekly/monthly/yearly trends)
    ============================================================ */
-function todaySleepHours() { return state.sleep[dateKey(new Date())] || 0; }
-function saveSleepForToday(hours) {
-  state.sleep[dateKey(new Date())] = hours;
-  saveSleep();
+
+/** Duration in hours between a bedtime and a wake time, handling the
+ *  overnight case (bed before midnight, wake after) automatically. */
+function computeSleepHours(bedTime, wakeTime) {
+  const [bh, bm] = bedTime.split(':').map(Number);
+  const [wh, wm] = wakeTime.split(':').map(Number);
+  const bedMinutes = bh * 60 + bm;
+  const wakeMinutes = wh * 60 + wm;
+  let diff = wakeMinutes - bedMinutes;
+  if (diff <= 0) diff += 24 * 60; // crossed midnight
+  return +(diff / 60).toFixed(2);
 }
+/** Reads sleep hours for a given date key, transparently supporting both
+ *  the legacy "plain number of hours" format and the current
+ *  { bedTime, wakeTime, hours } object format. */
+function sleepHoursForDate(key) {
+  const entry = state.sleep[key];
+  if (!entry) return 0;
+  return typeof entry === 'number' ? entry : (entry.hours || 0);
+}
+function todaySleepHours() { return sleepHoursForDate(dateKey(new Date())); }
+function todaySleepEntry() {
+  const entry = state.sleep[dateKey(new Date())];
+  return entry && typeof entry === 'object' ? entry : null;
+}
+function saveSleepForToday(bedTime, wakeTime) {
+  const hours = computeSleepHours(bedTime, wakeTime);
+  state.sleep[dateKey(new Date())] = { bedTime, wakeTime, hours };
+  saveSleep();
+  return hours;
+}
+
 function todayPrayerCompletion() {
   const key = dateKey(new Date());
   state.prayerCompletion[key] = state.prayerCompletion[key] || {};
@@ -4388,6 +4597,12 @@ function togglePrayerComplete(prayerKey, checked) {
   savePrayerCompletion();
   renderHealthView();
 }
+function prayerCountForDate(key) {
+  const entry = state.prayerCompletion[key];
+  if (!entry) return 0;
+  return Object.values(entry).filter(Boolean).length;
+}
+
 function computeHealthScore() {
   const waterPct = Math.min(1, waterTotalToday() / state.settings.water.goal);
   const sleepPct = Math.min(1, todaySleepHours() / (state.settings.sleepGoal || 8));
@@ -4399,6 +4614,120 @@ function computeHealthScore() {
   const score = Math.round(((waterPct + sleepPct + prayerPct + studyPct) / 4) * 100);
   return { score, waterPct, sleepPct, prayerPct, prayerCount, studyPct };
 }
+
+/* ---- Habit analytics: shared date-bucketing engine ---- */
+/** Builds label/date-range buckets for a given range mode. Reused across
+ *  every habit metric (water, sleep, prayer) so the bucketing logic lives
+ *  in exactly one place. */
+function getRangeBuckets(range, sampleDateKeys) {
+  const now = new Date();
+  const buckets = [];
+  if (range === 'daily') {
+    for (let i = 13; i >= 0; i--) {
+      const d = addDays(now, -i);
+      const key = dateKey(d);
+      buckets.push({ label: d.toLocaleDateString(undefined, { weekday: 'short' }), start: key, end: key });
+    }
+  } else if (range === 'weekly') {
+    for (let i = 7; i >= 0; i--) {
+      const end = addDays(now, -7 * i);
+      const start = addDays(end, -6);
+      buckets.push({ label: `${start.getDate()}/${start.getMonth() + 1}`, start: dateKey(start), end: dateKey(end) });
+    }
+  } else if (range === 'monthly') {
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthEnd = new Date(d.getFullYear(), d.getMonth() + 1, 0);
+      buckets.push({ label: d.toLocaleDateString(undefined, { month: 'short' }), start: dateKey(d), end: dateKey(monthEnd) });
+    }
+  } else {
+    const years = (sampleDateKeys || []).map(k => new Date(k).getFullYear()).filter(y => !isNaN(y));
+    const minYear = years.length ? Math.min(...years, now.getFullYear()) : now.getFullYear();
+    for (let y = minYear; y <= now.getFullYear(); y++) {
+      buckets.push({ label: String(y), start: `${y}-01-01`, end: `${y}-12-31` });
+    }
+  }
+  return buckets;
+}
+/** All date keys (inclusive) between two YYYY-MM-DD keys. Guarded against
+ *  runaway loops from malformed input. */
+function enumerateDateKeys(startKey, endKey) {
+  const keys = [];
+  let cur = stripTime(new Date(startKey));
+  const end = stripTime(new Date(endKey));
+  let guard = 0;
+  while (cur <= end && guard < 400) { keys.push(dateKey(cur)); cur = addDays(cur, 1); guard++; }
+  return keys;
+}
+/** Computes a chart-ready {labels, values} series for one habit metric
+ *  over one range mode. Water/Sleep are shown as a daily average within
+ *  each bucket (liters / hours); Prayer is shown as a completion %. */
+function computeHealthSeries(metric, range) {
+  const sourceMap = { water: state.water, sleep: state.sleep, prayer: state.prayerCompletion };
+  const buckets = getRangeBuckets(range, Object.keys(sourceMap[metric] || {}));
+  const labels = buckets.map(b => b.label);
+  const values = buckets.map(b => {
+    const days = enumerateDateKeys(b.start, b.end);
+    if (!days.length) return 0;
+    if (metric === 'water') {
+      const avgMl = days.reduce((a, k) => a + waterTotalForDate(k), 0) / days.length;
+      return +(avgMl / 1000).toFixed(2);
+    }
+    if (metric === 'sleep') {
+      const loggedDays = days.filter(k => state.sleep[k]);
+      if (!loggedDays.length) return 0;
+      return +(loggedDays.reduce((a, k) => a + sleepHoursForDate(k), 0) / loggedDays.length).toFixed(2);
+    }
+    const totalPossible = days.length * 5;
+    const totalDone = days.reduce((a, k) => a + prayerCountForDate(k), 0);
+    return totalPossible ? Math.round((totalDone / totalPossible) * 100) : 0;
+  });
+  return { labels, values };
+}
+function waterTotalForDate(key) {
+  return (state.water[key] || []).reduce((a, e) => a + e.amount, 0);
+}
+/** Counts consecutive days (working backward from today) where a habit
+ *  goal was met. If today hasn't met it yet, checks from yesterday so the
+ *  streak doesn't zero out the instant the clock passes midnight. */
+function computeHabitStreak(meetsGoalFn) {
+  let cursor = new Date();
+  if (!meetsGoalFn(dateKey(cursor))) cursor = addDays(cursor, -1);
+  let streak = 0, guard = 0;
+  while (meetsGoalFn(dateKey(cursor)) && guard < 3650) { streak++; cursor = addDays(cursor, -1); guard++; }
+  return streak;
+}
+
+let healthRange = 'daily';
+function renderHealthAnalytics() {
+  const waterCanvas = document.getElementById('waterChart');
+  const sleepCanvas = document.getElementById('sleepChart');
+  const prayerCanvas = document.getElementById('prayerChart');
+  if (!waterCanvas || !sleepCanvas || !prayerCanvas) return;
+
+  const water = computeHealthSeries('water', healthRange);
+  const sleep = computeHealthSeries('sleep', healthRange);
+  const prayer = computeHealthSeries('prayer', healthRange);
+
+  drawBarChart(waterCanvas, water.labels, water.values, { height: 140, valueFormatter: v => v.toFixed(1) + 'L' });
+  drawBarChart(sleepCanvas, sleep.labels, sleep.values, { height: 140, valueFormatter: v => v.toFixed(0) + 'h' });
+  drawBarChart(prayerCanvas, prayer.labels, prayer.values, { height: 140, valueFormatter: v => Math.round(v) + '%' });
+
+  const avg = arr => arr.length ? arr.reduce((a, v) => a + v, 0) / arr.length : 0;
+  document.getElementById('waterAvgLabel').textContent = `avg ${avg(water.values).toFixed(1)}L/day`;
+  document.getElementById('sleepAvgLabel').textContent = `avg ${avg(sleep.values).toFixed(1)}h/night`;
+  document.getElementById('prayerAvgLabel').textContent = `avg ${Math.round(avg(prayer.values))}%`;
+
+  const waterStreak = computeHabitStreak(k => waterTotalForDate(k) >= state.settings.water.goal);
+  const sleepStreak = computeHabitStreak(k => sleepHoursForDate(k) >= (state.settings.sleepGoal || 8));
+  const prayerStreak = computeHabitStreak(k => prayerCountForDate(k) >= 5);
+  document.getElementById('healthStreaksRow').innerHTML = `
+    <span class="habit-streak-chip"><span class="streak-icon">💧</span> ${waterStreak}-day water streak</span>
+    <span class="habit-streak-chip"><span class="streak-icon">😴</span> ${sleepStreak}-day sleep streak</span>
+    <span class="habit-streak-chip"><span class="streak-icon">🕌</span> ${prayerStreak}-day full-prayer streak</span>
+  `;
+}
+
 function renderHealthView() {
   updateWaterUI();
   const h = computeHealthScore();
@@ -4408,8 +4737,12 @@ function renderHealthView() {
   document.getElementById('healthSleepSub').textContent = `of ${state.settings.sleepGoal || 8}h goal`;
   document.getElementById('healthPrayerVal').textContent = `${h.prayerCount}/5`;
 
-  const sleepInput = document.getElementById('sleepHoursInput');
-  if (document.activeElement !== sleepInput) sleepInput.value = todaySleepHours() || '';
+  const bedInput = document.getElementById('bedTimeInput');
+  const wakeInput = document.getElementById('wakeTimeInput');
+  const todaysSleep = todaySleepEntry();
+  if (document.activeElement !== bedInput && todaysSleep) bedInput.value = todaysSleep.bedTime || '';
+  if (document.activeElement !== wakeInput && todaysSleep) wakeInput.value = todaysSleep.wakeTime || '';
+  document.getElementById('sleepComputedHours').textContent = todaySleepHours() ? `${todaySleepHours()}h` : '—';
   document.getElementById('sleepGoalInput').value = state.settings.sleepGoal || 8;
 
   const prayerLabels = { fajr: 'Fajr', dhuhr: 'Dhuhr', asr: 'Asr', maghrib: 'Maghrib', isha: 'Isha' };
@@ -4433,16 +4766,41 @@ function renderHealthView() {
   summaryParts.push(h.prayerCount === 5 ? 'all prayers logged' : `${h.prayerCount}/5 prayers logged`);
   summaryParts.push(h.studyPct >= 1 ? 'daily study goal met' : 'study goal still in progress');
   document.getElementById('wellnessSummary').textContent = `Today: ${summaryParts.join(', ')}.`;
+
+  renderHealthAnalytics();
 }
+
 function initHealth() {
+  function updateComputedSleepPreview() {
+    const bed = document.getElementById('bedTimeInput').value;
+    const wake = document.getElementById('wakeTimeInput').value;
+    const out = document.getElementById('sleepComputedHours');
+    if (bed && wake) out.textContent = `${computeSleepHours(bed, wake)}h`;
+    else out.textContent = todaySleepHours() ? `${todaySleepHours()}h` : '—';
+  }
+  document.getElementById('bedTimeInput').addEventListener('input', updateComputedSleepPreview);
+  document.getElementById('wakeTimeInput').addEventListener('input', updateComputedSleepPreview);
+
   document.getElementById('saveSleepBtn').addEventListener('click', () => {
-    const hours = Math.max(0, parseFloat(document.getElementById('sleepHoursInput').value) || 0);
+    const bed = document.getElementById('bedTimeInput').value;
+    const wake = document.getElementById('wakeTimeInput').value;
     const goal = Math.max(1, parseFloat(document.getElementById('sleepGoalInput').value) || 8);
-    saveSleepForToday(hours);
+    if (!bed || !wake) { toast('Enter both a bedtime and a wake-up time.'); return; }
+    const hours = saveSleepForToday(bed, wake);
     state.settings.sleepGoal = goal;
     saveSettings();
     renderHealthView();
-    toast('Sleep logged.');
+    Achievements.checkNew();
+    toast(`Sleep logged: ${hours}h.`);
+  });
+
+  document.getElementById('healthRange').addEventListener('click', e => {
+    const btn = e.target.closest('.range-btn');
+    if (!btn) return;
+    document.querySelectorAll('#healthRange .range-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    healthRange = btn.dataset.range;
+    renderHealthAnalytics();
   });
 }
 
